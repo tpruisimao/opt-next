@@ -1,0 +1,25 @@
+{
+  "name": "optum-next",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 8000",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@truepill/optum-component-library": "latest",
+    "@truepill/optum-react-provider": "latest",
+    "next": "10.1.2",
+    "react": "16.12.0",
+    "react-dom": "16.12.0",
+    "use-isomorphic-layout-effect": "^1.1.1"
+  },
+  "devDependencies": {
+    "@types/react": "16.14.0",
+    "eslint": "7.32.0",
+    "eslint-config-next": "11.1.2",
+    "typescript": "4.4.3"
+  }
+}
