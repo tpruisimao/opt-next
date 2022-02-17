@@ -9,8 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@truepill/optum-component-library": "latest",
-    "@truepill/optum-react-provider": "latest",
+    "@truepill/optum-component-library": "1.24.2",
+    "@truepill/optum-react-provider": "1.9.0",
     "next": "10.1.2",
     "react": "16.12.0",
     "react-dom": "16.12.0",

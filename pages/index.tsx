@@ -19,6 +19,8 @@ import {
 import "@truepill/optum-component-library/dist/index.min.css";
 import { useHeaderContent } from "../content/header";
 import { useState } from "react";
+import { useFooterContent } from "../content/footer";
+import { HeaderStoreProviderConfig } from "@truepill/optum-react-provider/dist/context/header/types";
 
 function documentToReactComponents() {
   return (
@@ -41,18 +43,23 @@ function Header({ content }: { content: HeaderProps["content"] }) {
   const { state, actions } = useHeaderStore();
   const { state: isBannerVisible, mutation } = useBannerVisibility();
 
-  function handleSearch(value: string) {
+  const handleChange: HeaderProps["searchAutoCompleteProps"]["onChange"] = (
+    e
+  ) => {
+    const value = e.target.value;
     setSearchTerm(value);
     search.get(value);
-  }
+  };
 
-  function handleSelect(value: string, option: SearchOptionType) {
+  const handleSelect: HeaderProps["searchAutoCompleteProps"]["onSelect"] = (
+    value,
+    option
+  ) => {
     setSearchTerm(value);
-    window.open(option.link, "_self");
-  }
+    window.open(option?.link, "_self");
+  };
 
-  function handleEnter(value: string) {
-    console.log(value);
+  function handleSearch(value: string) {
     if (!value) return;
 
     window.open(`/search?term=${value}`, "_self");
@@ -63,10 +70,6 @@ function Header({ content }: { content: HeaderProps["content"] }) {
     setSearchTerm("");
   }
 
-  const handleSignInOrSignUp: HeaderProps["onSignIn"] = (href: string) => {
-    window.open(href, "_self");
-  };
-
   const handleSignOut: HeaderProps["onSignOut"] = () => {
     actions.signOut();
   };
@@ -76,15 +79,17 @@ function Header({ content }: { content: HeaderProps["content"] }) {
   };
 
   const searchAutoComplete: HeaderProps["searchAutoCompleteProps"] = {
-    value: searchTerm,
+    // value: searchTerm,
     loading: search.status === Status.PENDING,
     hasNoResults:
-      search.status === Status.RESOLVED || search.status === Status.REJECTED,
+      (search.status === Status.RESOLVED ||
+        search.status === Status.REJECTED) &&
+      !search.data?.categories.length &&
+      !search.data?.matches.length,
     options: search.data,
     onSelect: handleSelect,
-    onSearch: handleSearch,
-    onEnter: handleEnter,
-    onChange: console.log,
+    onSubmitInput: handleSearch,
+    onChange: handleChange,
   };
 
   function handleCloseBanner() {
@@ -106,11 +111,9 @@ function Header({ content }: { content: HeaderProps["content"] }) {
       hasContentfulBanner={isBannerVisible}
       user={state.data?.user}
       cart={state.data?.cart}
-      notifications={state.data?.notifications}
+      notifications={state.data?.notification}
       searchAutoCompleteProps={searchAutoComplete}
       onClickLink={handleClickLink}
-      onSignIn={handleSignInOrSignUp}
-      onSignUp={handleSignInOrSignUp}
       onSignOut={handleSignOut}
       onCloseBanner={handleCloseBanner}
       onClickCartIcon={handleClickCart}
@@ -125,6 +128,7 @@ function Header({ content }: { content: HeaderProps["content"] }) {
 
 const Home: NextPage = ({ footerContent, headerContent }: any) => {
   const { mutation } = useSubscription({ baseUrl: mainConfig.baseUrl });
+  const content = useFooterContent();
 
   const featureFlags = {
     erectileDysfunction: true,
@@ -132,8 +136,9 @@ const Home: NextPage = ({ footerContent, headerContent }: any) => {
     pharmacy: true,
     smsTermsConditions: true,
   };
-  const config = {
+  const config: HeaderStoreProviderConfig = {
     ...mainConfig,
+    shouldRefreshToken: false,
     featureFlags: {
       userAccount: true,
     },
@@ -148,7 +153,7 @@ const Home: NextPage = ({ footerContent, headerContent }: any) => {
       <Footer
         onSubmitSubscription={mutation}
         featureFlags={featureFlags}
-        content={footerContent}
+        content={footerContent || content}
         documentToReactComponents={documentToReactComponents}
       />
     </div>
